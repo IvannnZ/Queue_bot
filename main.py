@@ -8,16 +8,13 @@ from collections import defaultdict
 #TODO add look queue
 #TODO rename queue_to_bot
 
-# Инициализация бота с токеном
 API_TOKEN = config.TOKEN
 bot = telebot.TeleBot(API_TOKEN)
 
-# Словарь для хранения очередей
 queues = defaultdict(list)
 queue_admins = {}
 
 
-# Обработка команды /start
 @bot.message_handler(commands=['start'])
 def start_handler(message):
     markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -25,12 +22,11 @@ def start_handler(message):
     bot.send_message(message.chat.id, "Привет! Что хочешь сделать?", reply_markup=markup)
 
 
-# Создание новой очереди
 @bot.message_handler(func=lambda message: message.text == 'Создать очередь')
 def create_queue(message):
     queue_id = len(queues) + 1
-    queues[queue_id].append(message.from_user.id)  # Добавляем создателя как первого участника
-    queue_admins[queue_id] = message.from_user.id  # Назначаем админа
+    queues[queue_id].append(message.from_user.id)
+    queue_admins[queue_id] = message.from_user.id
     bot.send_message(message.chat.id, f"Очередь #{queue_id} создана. Ты администратор этой очереди.")
 
 
@@ -60,7 +56,6 @@ def join_queue(message):
         bot.send_message(message.chat.id, "Пожалуйста, отправь номер очереди.")
 
 
-# Запрос места в очереди
 @bot.message_handler(commands=['my_position'])
 def my_position(message):
     position = None
@@ -73,7 +68,6 @@ def my_position(message):
         bot.send_message(message.chat.id, "Ты не стоишь ни в одной из очередей.")
 
 
-# Команда для вызова следующего участника (доступно только администратору)
 @bot.message_handler(commands=['next'])
 def next_in_queue(message):
     admin_queues = [qid for qid, admin_id in queue_admins.items() if admin_id == message.from_user.id]
@@ -93,5 +87,4 @@ def next_in_queue(message):
                 bot.send_message(message.chat.id, f"В очереди #{queue_id} нет больше участников.")
 
 
-# Запуск бота
 bot.polling(none_stop=True)
