@@ -14,7 +14,6 @@ bot = telebot.TeleBot(API_TOKEN)
 Queues = defaultdict(list)
 
 Admins = {}
-Queues = {}
 
 
 @bot.message_handler(commands=['start'])
