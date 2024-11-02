@@ -3,15 +3,15 @@ import config
 import queue_for_bot
 from collections import defaultdict
 
-#TODO add git
-#TODO add remove queue
-#TODO add look queue
-#TODO rename queue_to_bot
+from queue_for_bot import Admin
+
+# TODO add git
+# TODO add remove queue
+# TODO add look queue
+# TODO rename queue_to_bot
 
 API_TOKEN = config.TOKEN
 bot = telebot.TeleBot(API_TOKEN)
-
-Queues = defaultdict(list)
 
 Admins = {}
 
@@ -25,19 +25,22 @@ def start_handler(message):
 
 @bot.message_handler(func=lambda message: message.text == 'Создать очередь')
 def create_queue(message):
-    queue_id = len(Queues) + 1
-    Queues[queue_id].append(message.from_user.id)
-    Queue_admins[queue_id] = message.from_user.id
-    bot.send_message(message.chat.id, f"Очередь #{queue_id} создана. Ты администратор этой очереди.")
+    msg = bot.send_message(message.chat.id, "Введи своё имя")
+    bot.register_next_step_handler(msg, create_queue1)
 
 
-# Присоединение к очереди
+def create_queue1(message):
+    bot.send_message(message.chat.id, "Отлично, очередь создана\nP.s. ты в ней не стоишь, встань в неё сам")
+    Admins[message.chat.id] = Admin(message.chat.id, message.text)
+
+
 @bot.message_handler(func=lambda message: message.text == 'Встать в очередь')
 def join_queue_request(message):
-    if not Queues:
-        bot.send_message(message.chat.id, "На данный момент нет активных очередей.")
+    if not Admins:
+        bot.send_message(message.chat.id, "На данный момент нет активных очередей.\nВы можете создать её")
     else:
-        queue_list = "\n".join([f"#{queue_id}" for queue_id in Queues])
+
+        queue_list = "\n".join([f"#{admin_num} :{Admins[admin_num].name}" for admin_num in range(len(Admins))])
         msg = bot.send_message(message.chat.id, f"Выберите очередь, отправив её номер:\n{queue_list}")
         bot.register_next_step_handler(msg, join_queue)
 
@@ -45,7 +48,8 @@ def join_queue_request(message):
 def join_queue(message):
     try:
         queue_id = int(message.text)
-        if queue_id in Queues:
+
+        if queue_id < len(Admins):
             if message.from_user.id not in Queues[queue_id]:
                 Queues[queue_id].append(message.from_user.id)
                 bot.send_message(message.chat.id, f"Ты добавлен в очередь #{queue_id}. Ожидай своей очереди.")

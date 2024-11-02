@@ -14,15 +14,12 @@ class User:
 
 
 class Queue:
-    def __init__(self, name="base_name"):
-        self.name = name
+    def __init__(self, admin=None):
         self.queue = Q()
+        self.admin = admin
 
-    def set_queue_name(self, new_name):
-        self.name = new_name
-
-    def get_queue_name(self):
-        return self.name
+    def get_admin(self):
+        return self.admin
 
     def add_user(self, new_user: User):
         self.queue.put(new_user)
@@ -31,15 +28,11 @@ class Queue:
         return self.queue.get(), self.queue.queue[0]
 
 
-class Admin (User, Queue):
-    def __init__(self, id, name = "Base_name", name_queue="Base_name", queue = None):
-        User.__init__(id,name)
-        Queue.__init__(name_queue)
-        self.queue = queue
-
-
-    def set_queue(self,new_queue):
-        self.queue = new_queue
+class Admin(User, Queue):
+    def __init__(self, id, name="Basa_name", name_queue="Base_name", queue=None):
+        print(f"admin init: {name}")
+        User.__init__(id, name)
+        self.queue = Queue(self)
 
 
 if __name__ == "__main__":
