@@ -49,7 +49,7 @@ def create_queue(message):
         if Admins[i].id_Admin == message.chat.id:
             bot.send_message(message.chat.id, "Вы уже админ очереди, вы можете быть админом только 1 очереди",
                              reply_markup=markup_FULL_Admin)
-    msg = bot.send_message(message.chat.id, "Введи своё имя", reply_markup=markup_empty)
+    msg = bot.send_message(message.chat.id, "Введи имя очереди", reply_markup=markup_empty)
     bot.register_next_step_handler(msg, create_queue1)
 
 
@@ -146,16 +146,15 @@ def next_in_queue(message):
         elif next is None:
             send_User_or_Admin(now.id_User,
                                f"Ты сейчас сдаёшь, подойди для сдачи в очередь: {Admins[message.chat.id].name}")
-            del Admins[message.chat.id]
             bot.send_message(message.chat.id,
-                             "И так, поздравляю, это последний человек в очереди, но пользователи всё ещё могут добавиться",
-                             reply_markup=markup_FULL_User)
+                             f"И так, {Admins[message.chat.id].name}, последний человек в очереди, но пользователи всё ещё могут добавиться",
+                             reply_markup=markup_FULL_Admin)
             return
         else:
             send_User_or_Admin(now.id_User,
                                f"Ты сейчас сдаёшь, подойди для сдачи в очередь: {Admins[message.chat.id].name}")
             send_User_or_Admin(next.id_User,
-                               f"Ты сейчас сдаёшь следующим, подойди для сдачи в очередь: {Admins[message.chat.id].name}")
+                               f"Ты сдаёшь следующим, подойди для сдачи в очередь: {Admins[message.chat.id].name}")
             send_User_or_Admin(message.chat.id,
                                f"Сейчас сдаёт: {now.name}\nследующий: {next.name}\nвсего в очереди: {Admins[message.chat.id].lenght()}")
             return

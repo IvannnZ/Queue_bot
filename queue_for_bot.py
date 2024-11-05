@@ -37,6 +37,8 @@ class Queue:
     def __iter__(self):
         yield from self.queue
 
+    def __len__(self):
+        return len(self.queue)
 
     def lenght(self):
         return len(self.queue)
