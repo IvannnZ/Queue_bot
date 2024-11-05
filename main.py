@@ -5,10 +5,9 @@ from collections import defaultdict
 from queue_for_bot import Admin
 from queue_for_bot import User
 
-# TODO add git
-# TODO add remove queue
-# TODO add look queue
 # TODO rename queue_to_bot
+# TODO add log
+# TODO add advertisment
 
 API_TOKEN = config.TOKEN
 bot = telebot.TeleBot(API_TOKEN)
