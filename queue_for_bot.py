@@ -5,9 +5,13 @@ class User:
     def __init__(self, id, name="base_name"):
         self.id = id
         self.name = name
+        self.queues = []
 
     def set_name(self, new_name):
         self.name = new_name
+
+    def add_to_queue(self, new_queue):
+        self.queues.append(new_queue)
 
     def __str__(self):
         return f"name:{self.name}, ID:{self.id}"
@@ -15,7 +19,7 @@ class User:
 
 class Queue:
     def __init__(self, admin=None):
-        self.queue = list
+        self.queue = []
         self.admin = admin
 
     def get_admin(self):
@@ -25,10 +29,20 @@ class Queue:
         self.queue.append(new_user)
 
     def next_in_queue(self):
-        return self.queue.get(), self.queue.queue[0]
+        return self.queue.pop(0), self.queue[0]
 
     def __iter__(self):
         yield from self.queue
+
+    def search_by_id(self, id):
+        for i in range(len(self.queue)):
+            if self.queue[i].id == id:
+                return i
+        else:
+            return None
+
+    def lenght(self):
+        return len(self.queue)
 
 
 class Admin(User, Queue):
