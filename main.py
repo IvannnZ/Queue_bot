@@ -40,7 +40,7 @@ def send_User_or_Admin(id_User_or_Admin, text):
 
 @bot.message_handler(commands=['start'])
 def start_handler(message):
-    bot.send_message(message.chat.id, "Привет! Что хочешь сделать?", reply_markup=markup_FULL_User)
+    bot.send_message(message.chat.id, "Привет! Что хочешь сделать?\nПо всем вопросам @Not_IvannZ", reply_markup=markup_FULL_User)
 
 
 @bot.message_handler(func=lambda message: message.text == 'Создать очередь')
@@ -103,8 +103,8 @@ def join_queue(message):
                 queue_id -= 1
             if message.from_user.id not in Admins[admin_num]:
                 Admins[admin_num].add_user(Users[message.chat.id])
-
-                send_User_or_Admin(message.chat.id, f"Ты добавлен в очередь #{queue_id}. Ожидай своей очереди.")
+                print(Users ,f"Ты добавлен в очередь #{queue_id}. Ожидай своей очереди.")
+                send_User_or_Admin(message.chat.id, f"Ты добавлен в очередь #{queue_id}. Ожидай своей очереди.\nИ пока ждёшь можешь посмотреть канал создателя t.me/programm_not_math")
             else:
                 send_User_or_Admin(message.chat.id, "Ты уже в этой очереди.")
         else:
