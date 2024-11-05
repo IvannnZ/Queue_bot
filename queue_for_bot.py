@@ -15,17 +15,20 @@ class User:
 
 class Queue:
     def __init__(self, admin=None):
-        self.queue = Q()
+        self.queue = list
         self.admin = admin
 
     def get_admin(self):
         return self.admin
 
     def add_user(self, new_user: User):
-        self.queue.put(new_user)
+        self.queue.append(new_user)
 
     def next_in_queue(self):
         return self.queue.get(), self.queue.queue[0]
+
+    def __iter__(self):
+        yield from self.queue
 
 
 class Admin(User, Queue):
@@ -46,5 +49,6 @@ if __name__ == "__main__":
     q.add_user(c)
     q.add_user(d)
     print(q.next_in_queue()[0])
-
+    for i in q:
+        print(i.name)
     print(q.next_in_queue()[1])

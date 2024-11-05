@@ -48,9 +48,8 @@ def join_queue_request(message):
 def join_queue(message):
     try:
         queue_id = int(message.text)
-
         if queue_id < len(Admins):
-            if message.from_user.id not in Queues[queue_id]:
+            if message.from_user.id not in Admins[queue_id]:
                 Queues[queue_id].append(message.from_user.id)
                 bot.send_message(message.chat.id, f"Ты добавлен в очередь #{queue_id}. Ожидай своей очереди.")
             else:
