@@ -1,6 +1,5 @@
 import telebot
 import config
-from collections import defaultdict
 
 from queue_for_bot import Admin
 from queue_for_bot import User
@@ -24,10 +23,10 @@ markup_Get_in.row('Встать в очередь')
 markup_empty = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
 
 markup_FULL_Admin = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
-markup_FULL_Admin.row('Создать очередь', 'Встать в очередь', 'следующий', 'посмотреть где я')
+markup_FULL_Admin.row('Создать очередь', 'Встать в очередь', 'следующий', 'посмотреть где я', 'Посмотреть очередь')
 
 markup_FULL_User = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
-markup_FULL_User.row('Создать очередь', 'Встать в очередь', 'посмотреть где я')
+markup_FULL_User.row('Создать очередь', 'Встать в очередь', 'посмотреть где я', 'Посмотреть очередь')
 
 
 def send_User_or_Admin(id_User_or_Admin, text):
@@ -40,7 +39,8 @@ def send_User_or_Admin(id_User_or_Admin, text):
 
 @bot.message_handler(commands=['start'])
 def start_handler(message):
-    bot.send_message(message.chat.id, "Привет! Что хочешь сделать?\nПо всем вопросам @Not_IvannZ", reply_markup=markup_FULL_User)
+    bot.send_message(message.chat.id, "Привет! Что хочешь сделать?\nПо всем вопросам @Not_IvannZ",
+                     reply_markup=markup_FULL_User)
 
 
 @bot.message_handler(func=lambda message: message.text == 'Создать очередь')
@@ -49,6 +49,7 @@ def create_queue(message):
         if Admins[i].id_Admin == message.chat.id:
             bot.send_message(message.chat.id, "Вы уже админ очереди, вы можете быть админом только 1 очереди",
                              reply_markup=markup_FULL_Admin)
+            return
     msg = bot.send_message(message.chat.id, "Введи имя очереди", reply_markup=markup_empty)
     bot.register_next_step_handler(msg, create_queue1)
 
@@ -70,7 +71,7 @@ def join_queue_request(message):
             queue_list_l = list()
             for i in Admins:
                 queue_list_l.append(Admins[i].name)
-            queue_list = "\n".join([f"#{i} :{queue_list_l[i]}" for i in range(len(queue_list_l))])
+            queue_list = "\n".join([f"{i} :{queue_list_l[i]}" for i in range(len(queue_list_l))])
             msg = bot.send_message(message.chat.id, f"Выберите очередь, отправив её номер:\n{queue_list}",
                                    reply_markup=markup_empty)
             bot.register_next_step_handler(msg, join_queue)
@@ -84,7 +85,7 @@ def create_user(message):
     queue_list_l = list()
     for i in Admins:
         queue_list_l.append(Admins[i].name)
-    queue_list = "\n".join([f"#{i} :{queue_list_l[i]}" for i in range(len(queue_list_l))])
+    queue_list = "\n".join([f"{i} :{queue_list_l[i]}" for i in range(len(queue_list_l))])
 
     msg = bot.send_message(message.chat.id, f"Выберите очередь, отправив её номер:\n{queue_list}",
                            reply_markup=markup_empty)
@@ -103,17 +104,20 @@ def join_queue(message):
                 queue_id -= 1
             if message.from_user.id not in Admins[admin_num]:
                 Admins[admin_num].add_user(Users[message.chat.id])
-                print(Users ,f"Ты добавлен в очередь #{queue_id}. Ожидай своей очереди.")
-                send_User_or_Admin(message.chat.id, f"Ты добавлен в очередь #{queue_id}. Ожидай своей очереди.\nИ пока ждёшь можешь посмотреть канал создателя t.me/programm_not_math")
+                print(Users, f"Ты добавлен в очередь. Ожидай своей очереди.")
+                send_User_or_Admin(message.chat.id,
+                                   f"Ты добавлен в очередь. Ожидай своей очереди.\nИ пока ждёшь можешь посмотреть канал создателя t.me/programm_not_math")
             else:
                 send_User_or_Admin(message.chat.id, "Ты уже в этой очереди.")
         else:
             send_User_or_Admin(message.chat.id, "Очередь с таким номером не найдена.")
     except ValueError:
+        bot.send_message(message.chat.id, f"Бля, НОМЕР, А НЕ БУКВЫ",
+                         reply_markup=markup_empty)
         queue_list_l = list()
         for i in Admins:
             queue_list_l.append(Admins[i].name)
-        queue_list = "\n".join([f"#{i} :{queue_list_l[i]}" for i in range(len(queue_list_l))])
+        queue_list = "\n".join([f"{i} :{queue_list_l[i]}" for i in range(len(queue_list_l))])
 
         msg = bot.send_message(message.chat.id, f"Пожалуйста, отправь номер очереди.\n{queue_list}",
                                reply_markup=markup_empty)
@@ -162,6 +166,38 @@ def next_in_queue(message):
         bot.send_message(message.chat.id,
                          "ЙООООу, так, либо ты сломал бота, либо у меня что-то не так, так или иначе напиши мне @Not_IvannZ")
         return
+
+
+@bot.message_handler(func=lambda message: message.text == 'Посмотреть очередь')
+def create_queue(message):
+    queue_list_l = list()
+    for i in Admins:
+        queue_list_l.append(Admins[i].name)
+    queue_list = "\n".join([f"{i} :{queue_list_l[i]}" for i in range(len(queue_list_l))])
+
+    msg = bot.send_message(message.chat.id, f"Пожалуйста, отправь номер очереди.\n{queue_list}",
+                           reply_markup=markup_empty)
+    bot.register_next_step_handler(msg, show_queue)
+
+
+def show_queue(message):
+    try:
+        queue_id = int(message.text)
+        if queue_id < len(Admins):
+            admin_num = 0
+            for i in Admins:
+                if queue_id == 0:
+                    admin_num = i
+                    break
+                queue_id -= 1
+
+            answ = '\n'.join(f"{i.name}" for i in Admins[admin_num])
+            answ = f"В очереди {Admins[admin_num].name} {Admins[admin_num].lenght()} человек\n" + answ
+            send_User_or_Admin(message.chat.id, answ)
+        else:
+            send_User_or_Admin(message.chat.id, "Очередь с таким номером не найдена.")
+    except ValueError:
+        send_User_or_Admin(message.chat.id, f"Бля, НОМЕР, А НЕ БУКВЫ")
 
 
 bot.polling(none_stop=True)
